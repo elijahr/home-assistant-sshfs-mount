@@ -1,0 +1,58 @@
+# /addons/sshfs_mount/config.yaml
+name: "SSHFS Mount"
+version: "1.0.15"
+slug: "sshfs_mount"
+description: "Mounts a remote SSHFS share and re-shares it via Samba"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+init: false
+startup: services
+
+# --- Critical Privileges ---
+full_access: true
+homeassistant_api: true
+
+# --- FUSE Filesystem Support ---
+# Required for SSHFS mounting
+devices:
+  - /dev/fuse
+privileged:
+  - SYS_ADMIN
+apparmor: false
+
+# --- Network Port ---
+# Port 445 is exposed via EXPOSE in Dockerfile (internal network only)
+# No host port mapping to avoid conflicts with other Samba services
+
+# --- Configuration Options ---
+options:
+  allow_guest: false
+  samba_user: ""
+  samba_pass: ""
+  mountpoints:
+    - share_name: ""
+      remote_host: ""
+      remote_port: 22
+      remote_user: ""
+      remote_path: ""
+      auth_type: "password"
+      ssh_key: ""
+      ssh_password: ""
+
+schema:
+  allow_guest: bool
+  samba_user: str?
+  samba_pass: password?
+  mountpoints:
+    - share_name: str
+      remote_host: str
+      remote_port: int(1,65535)?
+      remote_user: str
+      remote_path: str
+      auth_type: list(key|password)
+      ssh_key: str?
+      ssh_password: password?

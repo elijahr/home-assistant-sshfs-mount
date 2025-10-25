@@ -1,0 +1,1 @@
+- Every time you finish a TODO item or fully implement a plan or request from me, bump the patch version in config.yaml

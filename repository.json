@@ -1,0 +1,5 @@
+{
+  "name": "SSHFS Mount Add-on Repository",
+  "url": "https://github.com/elijahr/home-assistant-sshfs-mount",
+  "maintainer": "Elijah Rutschman <elijah@elijahr.com>"
+}

@@ -1,0 +1,39 @@
+configuration:
+  allow_guest:
+    name: Allow Guest Access
+    description: Enable unauthenticated access to all shares. When enabled, no username or password is required to access the shares. WARNING - Anyone on your network can access the mounted files. Only use on trusted networks.
+  samba_user:
+    name: Samba Username
+    description: Username for accessing the Samba shares (ignored if Guest Access is enabled). This user will have access to all mounted shares.
+  samba_pass:
+    name: Samba Password
+    description: Password for the Samba user (ignored if Guest Access is enabled). Keep this secure as it protects access to all your mounted shares.
+  mountpoints:
+    name: Mountpoints
+    description: List of remote SSH servers to mount and share via Samba. Each mountpoint becomes a separate network share. IMPORTANT - After saving and starting this add-on, check the add-on logs for the IP address, then mount the shares in Home Assistant (Settings > System > Storage > Add network storage). See the Documentation tab for complete instructions.
+
+configuration.mountpoints:
+  share_name:
+    name: Share Name
+    description: Unique name for this share (alphanumeric, underscores, and hyphens only). This appears as the network share name and is used for internal identification. Examples "media_server", "backup-nas", "photos"
+  remote_host:
+    name: Remote Host
+    description: IP address or hostname of the remote SSH server to mount. Example "192.168.1.100" or "myserver.local"
+  remote_port:
+    name: Remote Port
+    description: SSH port on the remote server. Leave empty to use the default port 22.
+  remote_user:
+    name: Remote Username
+    description: Username for SSH authentication on the remote server.
+  remote_path:
+    name: Remote Path
+    description: Absolute path on the remote server to mount. Example "/mnt/storage" or "/home/user/shared"
+  auth_type:
+    name: Authentication Type
+    description: Choose how to authenticate to the remote server. "key" uses SSH key authentication (more secure), "password" uses password authentication (simpler).
+  ssh_key:
+    name: SSH Private Key
+    description: Private SSH key for authentication (required when Authentication Type is "key"). Include the full key including header and footer lines.
+  ssh_password:
+    name: SSH Password
+    description: Password for SSH authentication (required when Authentication Type is "password"). Only provide this OR an SSH key, not both.
