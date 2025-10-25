@@ -1,6 +1,6 @@
 # SSHFS Mount Add-on
 
-Mount remote SSH servers and share them via Samba in Home Assistant.
+Mount remote SSH servers in Home Assistant.
 
 [![License](https://img.shields.io/github/license/elijahr/home-assistant-sshfs-mount)](https://github.com/elijahr/home-assistant-sshfs-mount/blob/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/elijahr/home-assistant-sshfs-mount)](https://github.com/elijahr/home-assistant-sshfs-mount/releases)
