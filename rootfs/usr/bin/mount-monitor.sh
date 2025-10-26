@@ -6,6 +6,7 @@ source /usr/bin/mount-helper.sh
 
 STATE_DIR="/data/mount_state"
 EVENT_PIPE="/tmp/network_events"
+NETWORK_MONITOR_PID=""
 
 initialize_state_dir() {
     local share_name="$1"
@@ -271,6 +272,6 @@ main() {
     done
 }
 
-trap "kill $NETWORK_MONITOR_PID 2>/dev/null || true; rm -f $EVENT_PIPE" EXIT
+trap '[ -n "$NETWORK_MONITOR_PID" ] && kill $NETWORK_MONITOR_PID 2>/dev/null || true; rm -f $EVENT_PIPE' EXIT
 
 main

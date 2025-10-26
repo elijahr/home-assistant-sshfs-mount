@@ -1,6 +1,6 @@
 # /addons/sshfs_mount/config.yaml
 name: "SSHFS Mount"
-version: "1.0.16"
+version: "1.0.17"
 slug: "sshfs_mount"
 description: "Mounts a remote SSHFS share and re-shares it via Samba with automatic reconnection"
 arch:
