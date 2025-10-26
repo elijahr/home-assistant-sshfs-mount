@@ -15,7 +15,13 @@ repos:
     rev: v0.9.0
     hooks:
       - id: shellcheck
-        args: [-x, -e, SC1091]
+        args: [-x, -e, SC1091, -s, bash, -S, warning]
+
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.8.0-1
+    hooks:
+      - id: shfmt
+        args: [-i, '4', -ci, -bn, -w]
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.33.0

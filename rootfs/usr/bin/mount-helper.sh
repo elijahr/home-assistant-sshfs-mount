@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bashio
 
-set -e
+set -eu
 
 send_error_notification() {
     local title="$1"
@@ -111,15 +111,15 @@ mount_share() {
     if [ "$auth_type" = "key" ]; then
         local key_file="/root/.ssh/id_rsa_${share_name}"
         mkdir -p /root/.ssh
-        echo "${ssh_key}" > "$key_file"
+        echo "${ssh_key}" >"$key_file"
         chmod 600 "$key_file"
 
         if sshfs -o allow_other \
-                  -o StrictHostKeyChecking=no \
-                  -o IdentityFile="$key_file" \
-                  -p "$port" \
-                  "${user}@${host}:${path}" \
-                  "$mount_dir" 2>&1; then
+            -o StrictHostKeyChecking=no \
+            -o IdentityFile="$key_file" \
+            -p "$port" \
+            "${user}@${host}:${path}" \
+            "$mount_dir" 2>&1; then
             return 0
         else
             return 1
@@ -127,11 +127,11 @@ mount_share() {
 
     elif [ "$auth_type" = "password" ]; then
         if echo "$ssh_password" | sshpass -p "$ssh_password" sshfs -o allow_other \
-                  -o StrictHostKeyChecking=no \
-                  -o password_stdin \
-                  -p "$port" \
-                  "${user}@${host}:${path}" \
-                  "$mount_dir" 2>&1; then
+            -o StrictHostKeyChecking=no \
+            -o password_stdin \
+            -p "$port" \
+            "${user}@${host}:${path}" \
+            "$mount_dir" 2>&1; then
             return 0
         else
             return 1
@@ -167,10 +167,10 @@ calculate_backoff_delay() {
 
     local delay=$((base_delay * (2 ** retry_count)))
 
-    if [ $delay -gt $max_delay ]; then
-        echo $max_delay
+    if [ "$delay" -gt "$max_delay" ]; then
+        echo "$max_delay"
     else
-        echo $delay
+        echo "$delay"
     fi
 }
 

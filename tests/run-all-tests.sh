@@ -8,7 +8,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo ""
@@ -24,7 +23,8 @@ FAILED_SUITES=()
 
 run_test_suite() {
     local test_file="$1"
-    local test_name=$(basename "$test_file")
+    local test_name
+    test_name=$(basename "$test_file")
 
     SUITE_COUNT=$((SUITE_COUNT + 1))
 
@@ -39,6 +39,8 @@ run_test_suite() {
 # Run all test suites
 run_test_suite "${SCRIPT_DIR}/test-mount-helper.sh"
 run_test_suite "${SCRIPT_DIR}/test-state-management.sh"
+run_test_suite "${SCRIPT_DIR}/test-mount-monitor-integration.sh"
+run_test_suite "${SCRIPT_DIR}/test-sshfs-initial-mount-integration.sh"
 
 # Summary
 echo ""

@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bashio
 
-set -e
+set -eu
 
 source /usr/bin/mount-helper.sh
 
@@ -15,19 +15,19 @@ initialize_state_dir() {
     mkdir -p "$share_state_dir"
 
     if [ ! -f "${share_state_dir}/status" ]; then
-        echo "MOUNTED" > "${share_state_dir}/status"
+        echo "MOUNTED" >"${share_state_dir}/status"
     fi
 
     if [ ! -f "${share_state_dir}/retry_count" ]; then
-        echo "0" > "${share_state_dir}/retry_count"
+        echo "0" >"${share_state_dir}/retry_count"
     fi
 
     if [ ! -f "${share_state_dir}/last_check" ]; then
-        date +%s > "${share_state_dir}/last_check"
+        date +%s >"${share_state_dir}/last_check"
     fi
 
     if [ ! -f "${share_state_dir}/last_success" ]; then
-        date +%s > "${share_state_dir}/last_success"
+        date +%s >"${share_state_dir}/last_success"
     fi
 }
 
@@ -49,7 +49,7 @@ set_state() {
     local value="$3"
     local state_file="${STATE_DIR}/${share_name}/${field}"
 
-    echo "$value" > "$state_file"
+    echo "$value" >"$state_file"
 }
 
 send_notification() {
@@ -81,7 +81,7 @@ start_network_event_monitor() {
     (
         while true; do
             if inotifywait -e modify,create /proc/net/route >/dev/null 2>&1; then
-                echo "NETWORK_EVENT" > "$EVENT_PIPE" 2>/dev/null || true
+                echo "NETWORK_EVENT" >"$EVENT_PIPE" 2>/dev/null || true
             fi
             sleep 1
         done
@@ -147,7 +147,7 @@ check_and_reconnect_mount() {
     now=$(date +%s)
     local time_since_attempt=$((now - last_attempt))
 
-    if [ "$last_attempt" != "0" ] && [ $time_since_attempt -lt $delay ]; then
+    if [ "$last_attempt" != "0" ] && [ "$time_since_attempt" -lt "$delay" ]; then
         return 0
     fi
 
@@ -158,7 +158,7 @@ check_and_reconnect_mount() {
 
     unmount_share "$mount_dir"
 
-    if mount_share "$share_name" "$host" "$port" "$user" "$path" "$auth_type" "$ssh_key" "$ssh_password" 2>&1 | tee /tmp/mount_error_${share_name}.log; then
+    if mount_share "$share_name" "$host" "$port" "$user" "$path" "$auth_type" "$ssh_key" "$ssh_password" 2>&1 | tee "/tmp/mount_error_${share_name}.log"; then
         bashio::log.info "[${share_name}] Reconnection successful!"
         send_notification \
             "SSHFS Mount - Reconnected" \
@@ -167,13 +167,13 @@ check_and_reconnect_mount() {
         set_state "$share_name" "status" "MOUNTED"
         set_state "$share_name" "retry_count" "0"
         set_state "$share_name" "last_success" "$now"
-        rm -f /tmp/mount_error_${share_name}.log
+        rm -f "/tmp/mount_error_${share_name}.log"
         return 0
     else
         local error_output=""
-        if [ -f /tmp/mount_error_${share_name}.log ]; then
-            error_output=$(cat /tmp/mount_error_${share_name}.log)
-            rm -f /tmp/mount_error_${share_name}.log
+        if [ -f "/tmp/mount_error_${share_name}.log" ]; then
+            error_output=$(cat "/tmp/mount_error_${share_name}.log")
+            rm -f "/tmp/mount_error_${share_name}.log"
         fi
 
         if echo "$error_output" | grep -qi "permission denied\|authentication failed\|publickey"; then
@@ -237,14 +237,14 @@ main() {
         local check_triggered=false
 
         if [ -p "$EVENT_PIPE" ]; then
-            if read -t 0 event < "$EVENT_PIPE" 2>/dev/null; then
+            if read -t 0 <"$EVENT_PIPE" 2>/dev/null; then
                 bashio::log.debug "Network event detected, triggering health check..."
                 check_triggered=true
                 last_check=0
             fi
         fi
 
-        if [ $((now - last_check)) -ge $check_interval ] || [ "$check_triggered" = true ]; then
+        if [ $((now - last_check)) -ge "$check_interval" ] || [ "$check_triggered" = true ]; then
             for i in "${!MOUNTPOINT_SHARE_NAMES[@]}"; do
                 share_name="${MOUNTPOINT_SHARE_NAMES[$i]}"
                 host="${MOUNTPOINT_HOSTS[$i]}"

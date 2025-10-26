@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bashio
 
-set -e
+set -eu
 
 source /usr/bin/mount-helper.sh
 
@@ -100,7 +100,7 @@ fi
 
 bashio::log.info "Generating Samba configuration..."
 
-cat /etc/smb.conf.template > /etc/samba/smb.conf
+cat /etc/smb.conf.template >/etc/samba/smb.conf
 
 for i in "${SUCCESSFUL_MOUNTS[@]}"; do
     share_name="${MOUNTPOINT_SHARE_NAMES[$i]}"
@@ -109,7 +109,7 @@ for i in "${SUCCESSFUL_MOUNTS[@]}"; do
     bashio::log.info "Adding Samba share: [${share_name}] -> ${mount_dir}"
 
     if [ "$ALLOW_GUEST" = "true" ]; then
-        cat >> /etc/samba/smb.conf <<EOF
+        cat >>/etc/samba/smb.conf <<EOF
 
 [${share_name}]
    path = ${mount_dir}
@@ -122,7 +122,7 @@ for i in "${SUCCESSFUL_MOUNTS[@]}"; do
    force user = root
 EOF
     else
-        cat >> /etc/samba/smb.conf <<EOF
+        cat >>/etc/samba/smb.conf <<EOF
 
 [${share_name}]
    path = ${mount_dir}
@@ -148,7 +148,10 @@ if [ "$ALLOW_GUEST" = "false" ]; then
 
     smbpasswd -x "${SAMBA_USER}" >/dev/null 2>&1 || true
 
-    if ! (echo "${SAMBA_PASS}"; echo "${SAMBA_PASS}") | smbpasswd -a -s "${SAMBA_USER}" >/dev/null 2>&1; then
+    if ! (
+        echo "${SAMBA_PASS}"
+        echo "${SAMBA_PASS}"
+    ) | smbpasswd -a -s "${SAMBA_USER}" >/dev/null 2>&1; then
         bashio::log.error "Failed to create Samba user '${SAMBA_USER}'"
         send_error_notification \
             "SSHFS Mount - Samba User Error" \
