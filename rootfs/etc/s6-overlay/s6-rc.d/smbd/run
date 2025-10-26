@@ -1,0 +1,4 @@
+#!/command/with-contenv bashio
+
+bashio::log.info "Starting Samba daemon..."
+exec /usr/sbin/smbd -F --no-process-group

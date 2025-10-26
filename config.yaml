@@ -1,8 +1,8 @@
 # /addons/sshfs_mount/config.yaml
 name: "SSHFS Mount"
-version: "1.0.15"
+version: "1.0.16"
 slug: "sshfs_mount"
-description: "Mounts a remote SSHFS share and re-shares it via Samba"
+description: "Mounts a remote SSHFS share and re-shares it via Samba with automatic reconnection"
 arch:
   - aarch64
   - amd64
@@ -11,6 +11,7 @@ arch:
   - i386
 init: false
 startup: services
+watchdog: "tcp://[HOST]:445"
 
 # --- Critical Privileges ---
 full_access: true
@@ -42,6 +43,13 @@ options:
       auth_type: "password"
       ssh_key: ""
       ssh_password: ""
+  reconnect_enabled: true
+  reconnect_check_interval: 60
+  reconnect_use_events: true
+  reconnect_base_delay: 5
+  reconnect_max_delay: 3600
+  reconnect_notify_ha: true
+  ssh_enabled: false
 
 schema:
   allow_guest: bool
@@ -56,3 +64,10 @@ schema:
       auth_type: list(key|password)
       ssh_key: str?
       ssh_password: password?
+  reconnect_enabled: bool?
+  reconnect_check_interval: int(10,600)?
+  reconnect_use_events: bool?
+  reconnect_base_delay: int(1,60)?
+  reconnect_max_delay: int(60,7200)?
+  reconnect_notify_ha: bool?
+  ssh_enabled: bool?

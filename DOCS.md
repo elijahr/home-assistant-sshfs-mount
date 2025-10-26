@@ -47,6 +47,57 @@ Before configuring this add-on, you need:
 - Required when guest access is disabled
 - Keep this secure - it protects all your mounted shares
 
+### Reconnection Settings (Advanced)
+
+The add-on includes automatic reconnection for failed mounts. These settings are optional and have sensible defaults.
+
+**Reconnect Enabled** (checkbox, default: true)
+- Enable automatic reconnection for failed mounts
+- When enabled, the add-on continuously monitors mount health
+- Failed mounts will automatically retry with exponential backoff
+- Disable only if you want manual control over reconnections
+
+**Reconnect Check Interval** (number, default: 60)
+- How often (in seconds) to check mount health
+- Range: 10-600 seconds
+- Lower values = faster detection but more overhead
+- Recommended: 60 seconds for most use cases
+
+**Reconnect Use Events** (checkbox, default: true)
+- Use network event monitoring for immediate reconnection
+- When network changes are detected, health checks trigger instantly
+- Falls back to interval-based checking if events unavailable
+- Recommended: keep enabled for best responsiveness
+
+**Reconnect Base Delay** (number, default: 5)
+- Base delay in seconds for exponential backoff
+- First retry after 5s, then 10s, 20s, 40s, etc.
+- Range: 1-60 seconds
+- Lower values = more aggressive retries
+
+**Reconnect Max Delay** (number, default: 3600)
+- Maximum delay (in seconds) between retry attempts
+- Caps the exponential backoff at this value
+- Range: 60-7200 seconds (1 minute to 2 hours)
+- Default: 3600 seconds (1 hour)
+
+**Reconnect Notify HA** (checkbox, default: true)
+- Send Home Assistant notifications for mount events
+- Notifies on first failure, successful recovery, and auth errors
+- Disable if you don't want persistent notifications
+- Recommended: keep enabled to stay informed
+
+### SSH Debug Mode (Advanced)
+
+**SSH Enabled** (checkbox, default: false)
+- **⚠️ FOR DEBUGGING ONLY** - Not for production use
+- Enables SSH access to the container for troubleshooting
+- Fixed credentials: user `root`, password `sshfs-mount`
+- Access via container IP on port 22
+- ⚠️ **Security Warning**: Uses weak fixed password
+- Only enable temporarily when debugging issues
+- Disable immediately after troubleshooting
+
 ### Mountpoint Configuration
 
 You can configure multiple mountpoints. Each mountpoint requires:
@@ -367,11 +418,23 @@ A: No, this add-on only supports SSH/SSHFS. Use other add-ons for NFS or differe
 
 **Q: Will files stay mounted if the remote server goes offline?**
 
-A: If the remote server goes offline, the mount will become unavailable. The add-on will try to reconnect on restart.
+A: No, but the add-on will automatically reconnect! When a remote server goes offline or network connectivity is lost, the mount monitoring service detects the failure and automatically attempts to reconnect with exponential backoff. You'll receive Home Assistant notifications when mounts fail and recover. The reconnection happens automatically - no restart needed.
 
 **Q: Can I write files to the mounted shares?**
 
 A: Yes, if the remote user has write permissions. The Samba shares are configured as read/write.
+
+**Q: How does automatic reconnection work?**
+
+A: The add-on runs a monitoring service that checks mount health every 60 seconds (configurable). It also listens for network events for instant detection. When a mount fails, it uses exponential backoff (5s, 10s, 20s, 40s, ..., up to 1 hour) to avoid hammering the remote server. Authentication failures won't retry indefinitely - the add-on is smart enough to distinguish network issues from credential problems.
+
+**Q: How do I enable SSH access for debugging?**
+
+A: Set `ssh_enabled: true` in the configuration. This enables SSH access with fixed credentials (root/sshfs-mount) on port 22 of the container IP. **Important**: This is only for debugging - disable it immediately after troubleshooting. The password is intentionally weak to discourage production use.
+
+**Q: Will reconnection work if my network interface restarts?**
+
+A: Yes! The add-on monitors network events and triggers immediate health checks when network changes are detected. This means reconnection happens within seconds of network recovery, not minutes.
 
 ## Support
 

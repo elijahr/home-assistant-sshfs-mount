@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.16] - 2025-01-25
+
+### Added
+- **Automatic reconnection** for SSHFS mounts with exponential backoff
+- **Network event monitoring** for fast reconnection on network changes
+- **Health monitoring** service that continuously checks mount status
+- **SSH debug mode** for container troubleshooting (disabled by default, fixed credentials: root/sshfs-mount)
+- **Home Assistant notifications** for mount failures and recoveries
+- **Watchdog integration** for automatic Samba daemon restart on failure
+- **State persistence** across container restarts
+- Configuration options for reconnection behavior:
+  - `reconnect_enabled` - Enable/disable automatic reconnection (default: true)
+  - `reconnect_check_interval` - Health check frequency in seconds (default: 60)
+  - `reconnect_use_events` - Use network event monitoring (default: true)
+  - `reconnect_base_delay` - Base delay for exponential backoff (default: 5s)
+  - `reconnect_max_delay` - Maximum retry delay cap (default: 3600s/1 hour)
+  - `reconnect_notify_ha` - Send Home Assistant notifications (default: true)
+  - `ssh_enabled` - Enable SSH debug mode (default: false)
+
+### Changed
+- **Migrated to s6-overlay v3** for proper multi-service process supervision
+- Refactored codebase into modular, reusable components
+- Services now run independently with proper dependency management
+- Improved error handling and classification (auth failures won't retry indefinitely)
+
+### Fixed
+- Mounts now automatically recover from network interruptions
+- Mounts now automatically recover from remote server restarts
+- Hung/stale mounts are properly detected and remounted
+- Samba daemon automatically restarts if it becomes unresponsive
+
 ## [1.0.15] - 2025-01-25
 
 ### Fixed
@@ -56,5 +87,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - Additional authentication options
-- Mount status monitoring
-- Reconnection handling for dropped connections

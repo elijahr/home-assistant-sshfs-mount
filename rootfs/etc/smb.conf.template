@@ -1,0 +1,10 @@
+# /addons/sshfs_mount/smb.conf.template
+[global]
+   workgroup = WORKGROUP
+   server string = %h server (Samba, Home Assistant Add-on)
+   log file = /dev/stdout
+   load printers = no
+   printing = bsd
+   printcap name = /dev/null
+   disable spoolss = yes
+   map to guest = bad user

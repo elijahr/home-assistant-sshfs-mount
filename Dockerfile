@@ -2,22 +2,17 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# Install dependencies: sshfs (for FUSE), samba (to re-share), and sshpass (for password auth)
+# Install dependencies
 RUN apk add --no-cache \
     openssh-client \
+    openssh-server \
     sshfs \
     samba \
-    sshpass
+    sshpass \
+    inotify-tools
 
-# Copy the run script and smb.conf template
-COPY run.sh /
-COPY smb.conf.template /
-
-# Make the run script executable
-RUN chmod a+x /run.sh
-RUN chmod a+x /smb.conf.template
+# Copy rootfs with s6-overlay services and scripts
+COPY rootfs /
 
 # Expose Samba port internally (no host binding)
 EXPOSE 445
-
-CMD [ "/run.sh" ]
